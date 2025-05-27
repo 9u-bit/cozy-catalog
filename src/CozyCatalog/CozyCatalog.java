@@ -160,7 +160,7 @@ public class CozyCatalog extends JFrame {
 			 public void focusGained(java.awt.event.FocusEvent e) {
 			     if (txtUsername.getText().equals(usernamePlaceholder)) {
 			         txtUsername.setText("");
-			         txtUsername.setForeground(new Color(74, 59, 59)); // Your normal color
+			         txtUsername.setForeground(new Color(74, 59, 59));
 			     }
 			 }
 			 public void focusLost(java.awt.event.FocusEvent e) {
@@ -176,7 +176,7 @@ public class CozyCatalog extends JFrame {
 		        String pwd = String.valueOf(passwordField.getPassword());
 		        if (pwd.equals(passwordPlaceholder)) {
 		            passwordField.setText("");
-		            passwordField.setEchoChar('●'); // Use bullet character to mask input
+		            passwordField.setEchoChar('●');
 		            passwordField.setForeground(new Color(74, 59, 59));
 		        }
 		    }
@@ -185,7 +185,7 @@ public class CozyCatalog extends JFrame {
 		        String pwd = String.valueOf(passwordField.getPassword());
 		        if (pwd.isEmpty()) {
 		            passwordField.setText(passwordPlaceholder);
-		            passwordField.setEchoChar((char)0); // Show placeholder as plain text
+		            passwordField.setEchoChar((char)0);
 		            passwordField.setForeground(Color.GRAY);
 		        }
 		    }
