@@ -26,6 +26,8 @@ values ('ponkan9u', 'ineedtocodemore');
 
 -- Stored Procedures
 
+-- User login
+
 delimiter //
 create procedure Login(
     in _username varchar(8),
@@ -43,5 +45,29 @@ begin
     else
         set _success = false; -- Login failed
     end if;
+end //
+delimiter ;
+
+-- Add a new catalog
+
+delimiter //
+create procedure AddCatalog(
+	in _name varchar(20),
+    out _success boolean
+)
+begin
+	declare exist int;
+    
+    select count(*) into exist
+    from catalog
+    where name = _name;
+    
+    if exist = 0 then
+		insert into catalog (name)
+        values (_name);
+        set _success = true;
+	else
+		set _success = false;
+	end if;
 end //
 delimiter ;

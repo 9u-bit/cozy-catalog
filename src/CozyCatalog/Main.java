@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -57,7 +58,52 @@ public class Main extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		loadCatalogs();
+		
 		JButton BtnAddCatalog = new JButton("+ Add Catalog");
+		BtnAddCatalog.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        String catalogName = JOptionPane.showInputDialog(null, "Enter catalog name:", "Add Catalog", JOptionPane.PLAIN_MESSAGE);
+		        
+		        if (catalogName != null && !catalogName.trim().isEmpty()) {
+		        	Connection conn = null;
+		        	try {
+		        	    String dbURL = "jdbc:mysql://localhost:3306/cozyCatalog";
+		        	    String dbUname = "root";
+		        	    String dbPass = "1234";
+
+		        	    conn = DriverManager.getConnection(dbURL, dbUname, dbPass);
+		        	    if (conn != null) {
+		        	        System.out.println("Connected to the database!");
+		        	    }
+
+		        	    String SQLAddCatalog = "CALL AddCatalog(?, ?)";
+		        	    CallableStatement pstmt = conn.prepareCall(SQLAddCatalog);
+		        	    pstmt.setString(1, catalogName);
+		        	    pstmt.registerOutParameter(2, Types.BOOLEAN);
+
+		        	    pstmt.execute();
+
+		        	    boolean success = pstmt.getBoolean(2);
+
+		        	    if (success) {
+		        	        JOptionPane.showMessageDialog(null, "Catalog added successfully!");
+		        	        addCatalogButton(catalogName);
+
+		                } else {
+		                    JOptionPane.showMessageDialog(null, "Catalog already exists. Try a different name.");
+		                }
+
+		                pstmt.close();
+		                conn.close();
+
+		            } catch (SQLException ex) {
+		                System.out.println("An error occurred while trying to add the catalog.");
+		                System.out.println(ex.getMessage());
+		            }
+		        }
+		    }
+		});
 		BtnAddCatalog.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
 		BtnAddCatalog.setForeground(new Color(74, 59, 59));
 		BtnAddCatalog.setBackground(new Color(255, 195, 195));
@@ -90,8 +136,62 @@ public class Main extends JFrame {
 		JLabel lblCat = new JLabel(scaledIcon);
 		lblCat.setBounds(-43, 347, 196, 126);
 		contentPane.add(lblCat);
-		
-		
+
+	}
+	
+	private void loadCatalogs() {
+	    Connection conn = null;
+	    try {
+	        String dbURL = "jdbc:mysql://localhost:3306/cozyCatalog";
+	        String dbUname = "root";
+	        String dbPass = "1234";
+
+	        conn = DriverManager.getConnection(dbURL, dbUname, dbPass);
+	        if (conn != null) {
+	            System.out.println("Connected to the database!");
+	        }
+
+	        String SQLGetCatalogs = "SELECT name FROM catalog";
+	        CallableStatement pstmt = conn.prepareCall(SQLGetCatalogs);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            String catalogName = rs.getString("name");
+	            addCatalogButton(catalogName);
+	        }
+
+	        pstmt.close();
+	        conn.close();
+
+	    } catch (SQLException ex) {
+	        System.out.println("Error fetching catalogs: " + ex.getMessage());
+	    }
+	}
+
+	// 
+	private void addCatalogButton(String catalogName) {
+	    int catalogCount = contentPane.getComponentCount() - 1;
+	    int row = catalogCount / 5;
+	    int col = catalogCount % 5;
+	    int x = 123 + (col * 110);
+	    int y = 60 + (row * 110);
+
+	    JButton catalogButton = new JButton(catalogName);
+	    catalogButton.setForeground(new Color(74, 59, 59));
+	    catalogButton.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
+	    catalogButton.setBackground(new Color(184, 226, 200));
+	    catalogButton.setBounds(x, y, 100, 100);
+
+	    catalogButton.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            Catalog catalogFrame = new Catalog(catalogName);
+	            catalogFrame.setVisible(true);
+	        }
+	    });
+
+	    contentPane.add(catalogButton);
+	    contentPane.revalidate();
+	    contentPane.repaint();
 	}
 
 }
